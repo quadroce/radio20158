@@ -11,7 +11,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Radio 20158',
-      theme: AppTheme.appThemeDataLight,
+      theme: ThemeData(
+        primaryColor: Colors.black, // set primary color to blue
+        // add any other theme customization here
+      ),
+      //theme: AppTheme.appThemeDataLight,
+
       debugShowCheckedModeBanner: false,
       home: SplashPage(),
     );
@@ -48,6 +53,8 @@ class _SplashPageState extends State<SplashPage> {
               'Loading $_progress%',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 20),
+            Text("voci e suoni dal quartiere"),
           ],
         ),
       ),

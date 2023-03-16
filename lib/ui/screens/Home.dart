@@ -1,5 +1,6 @@
 //import 'dart:js';
 import 'package:flutter/material.dart';
+
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
@@ -72,6 +73,7 @@ class _HomeState extends State<Home> {
               link: rssItem.link!,
               datePublished: rssItem.pubDate.toString(),
               enclosure: rssItem.enclosure!.url!,
+              summary: rssItem.itunes!.summary.toString(),
               image: rssItem.itunes?.image.toString(),
             );
 
@@ -103,6 +105,7 @@ class _HomeState extends State<Home> {
               link: rssItem.link!,
               datePublished: rssItem.pubDate.toString(),
               enclosure: rssItem.enclosure!.url!,
+              summary: rssItem.itunes!.summary!,
               image: rssItem.itunes?.image?.href != null
                   ? Uri.parse(rssItem.itunes!.image!.href!).toString()
                   : null,
@@ -127,6 +130,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Radio 20158'),
       ),
       body: _rssFeed == null
@@ -163,6 +167,7 @@ class MediumArticle {
   String link;
   String datePublished;
   String enclosure;
+  String summary;
   final String? image;
 
   MediumArticle({
@@ -170,6 +175,7 @@ class MediumArticle {
     required this.link,
     required this.datePublished,
     required this.enclosure,
+    required this.summary,
     required this.image,
   });
 }
@@ -186,20 +192,23 @@ class MediumArticleItem extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-              title: Text(article.title),
-              subtitle: Text(article.datePublished),
-              trailing: ElevatedButton(
-                  onPressed: () async {
-                    openAudioPlayer(
-                        article.enclosure.toString(), article, context);
-                  },
-                  child: Text("ascolta"))),
-
-          /*          FadeInImage.assetNetwork(
-            placeholder: 'images/placeholder.png',
-            image: article.image,
+            leading: SizedBox(
+              width: 50, // set the width of the image
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/placeholder.png',
+                image: article.image!,
+                fit: BoxFit.cover, // set the image fit to cover the box
+              ),
+            ),
+            title: Text(article.title),
+            subtitle: Text(article.datePublished),
+            trailing: ElevatedButton(
+              onPressed: () async {
+                openAudioPlayer(article.enclosure.toString(), article, context);
+              },
+              child: Text("ascolta"),
+            ),
           ),
-  */
         ],
       ),
     );
@@ -212,16 +221,18 @@ void openAudioPlayer(
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => AudioPlayerScreen(
-              url2, mediumArticle.title, mediumArticle.image.toString())));
+          builder: (context) => AudioPlayerScreen(url2, mediumArticle.title,
+              mediumArticle.summary, mediumArticle.image.toString())));
 }
 
 class AudioPlayerScreen extends StatefulWidget {
   final String url;
   final String mediumArticletitle;
+  final String mediumArticleDescription;
   final String itunesImage;
 
-  AudioPlayerScreen(this.url, this.mediumArticletitle, this.itunesImage);
+  AudioPlayerScreen(this.url, this.mediumArticletitle,
+      this.mediumArticleDescription, this.itunesImage);
 
   @override
   _AudioPlayerScreenState createState() => _AudioPlayerScreenState();
@@ -253,6 +264,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool _isPlaying = false;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.mediumArticletitle),
@@ -264,8 +276,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image(
-                  image: NetworkImage(widget.itunesImage.toString()),
+                FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/placeholder.png',
+                  image: widget.itunesImage.toString(),
                   width: 300,
                 ),
               ],
@@ -278,7 +291,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 Text(widget.mediumArticletitle,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 24,
                     )),
               ],
             ),
@@ -301,8 +314,21 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.play_arrow),
+                  icon: Icon(
+                    Icons.play_arrow,
+                    color:
+                        _isPlaying ? Color.fromARGB(255, 205, 254, 11) : null,
+                  ),
                   onPressed: () async {
+                    setState(() {
+                      _isPlaying = true;
+                      // Change color to red (or any other color) when button is pressed
+                      // by passing the new color as a parameter to setState
+                      Color newColor = Color.fromARGB(255, 254, 11, 11);
+                      // Pass the new color as a parameter to setState
+                      // to trigger a rebuild of the widget tree with the new color
+                      var _iconColor = newColor;
+                    });
                     await _audioPlayer.play();
                   },
                 ),
@@ -316,6 +342,24 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 ),
               ],
             ),
+            /* Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(
+                      28.0), // add 8 pixels of padding on all sides
+                  child: Text(
+                    widget.mediumArticleDescription,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    overflow:
+                        TextOverflow.ellipsis, // add ellipsis if text overflows
+                    // limit text to one line
+                  ),
+                ),
+              ],
+            ) */
           ],
         ),
       ),
