@@ -10,7 +10,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Radio 20158',
+      theme: ThemeData(
+        brightness: Brightness.dark, // set brightness to dark
+        scaffoldBackgroundColor: Color.fromRGBO(38, 34, 47, 0.8),
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(
+            fontFamily: 'Lexend Deca', // change the font family here
+            fontSize:
+                16.0, // you can also adjust the font size and other properties
+            fontWeight: FontWeight.normal,
+            color: Colors.white,
+          ),
+        ),
+        // set background color to black
 
+        // add any other theme customization here
+      ),
       //theme: AppTheme.appThemeDataLight,
 
       debugShowCheckedModeBanner: false,

@@ -1,5 +1,7 @@
 //import 'dart:js';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
@@ -91,6 +93,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting('it_IT', null);
 
     getMediumRSSFeedData(1).then((feed) {
       updateFeed(feed);
@@ -148,14 +151,6 @@ class _HomeState extends State<Home> {
                     },
                   ),
                 ),
-                _isLoadingMore
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : ElevatedButton(
-                        onPressed: () => loadMoreData(),
-                        child: Text('Load More'),
-                      ),
               ],
             ),
     );
@@ -202,7 +197,8 @@ class MediumArticleItem extends StatelessWidget {
               ),
             ),
             title: Text(article.title),
-            subtitle: Text(article.datePublished),
+            subtitle: Text(DateFormat('dd MMMM y', 'it_IT')
+                .format(DateTime.parse(article.datePublished))),
             trailing: ElevatedButton(
               onPressed: () async {
                 openAudioPlayer(article.enclosure.toString(), article, context);
