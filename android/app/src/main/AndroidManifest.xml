@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.radio_20158_2">
     <application
-        android:label="radio_20158_2"
+        android:label="Radio 20158"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/my_app_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

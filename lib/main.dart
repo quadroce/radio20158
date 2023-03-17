@@ -1,4 +1,3 @@
-import 'package:radio20158/styles/theme.dart';
 import 'package:radio20158/ui/screens/Home.dart';
 import 'package:flutter/material.dart';
 
@@ -11,10 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Radio 20158',
-      theme: ThemeData(
-        primaryColor: Colors.black, // set primary color to blue
-        // add any other theme customization here
-      ),
+
       //theme: AppTheme.appThemeDataLight,
 
       debugShowCheckedModeBanner: false,
@@ -47,7 +43,7 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/splash.png'),
+            //           Image.asset('assets/images/splash.png'),
             SizedBox(height: 20),
             Text(
               'Loading $_progress%',
@@ -67,7 +63,7 @@ class _SplashPageState extends State<SplashPage> {
 
     // Simulate loading data
     while (loaded < total) {
-      await Future.delayed(Duration(milliseconds: 20));
+      await Future.delayed(Duration(milliseconds: 1));
       setState(() {
         _progress = (loaded / total) * 100;
       });

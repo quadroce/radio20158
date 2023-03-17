@@ -169,6 +169,7 @@ class MediumArticle {
   String enclosure;
   String summary;
   final String? image;
+  Duration position = Duration.zero;
 
   MediumArticle({
     required this.title,
@@ -256,6 +257,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Future<void> _initAudioPlayer() async {
     try {
       await _audioPlayer.setUrl(widget.url);
+
       await _audioPlayer.play();
     } catch (e) {
       print('Error playing audio: $e');
@@ -265,6 +267,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     bool _isPlaying = false;
+    Duration? _duration = _audioPlayer.duration ?? Duration.zero;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.mediumArticletitle),
@@ -342,7 +346,61 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 ),
               ],
             ),
-            /* Row(
+
+            StreamBuilder<Duration>(
+              stream: _audioPlayer.positionStream,
+              builder:
+                  (BuildContext context, AsyncSnapshot<Duration> snapshot) {
+                final Duration position = snapshot.data ?? Duration.zero;
+                final String positionText =
+                    position.toString().split('.').first;
+                final String durationText =
+                    _duration.toString().split('.').first;
+                return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    _duration = _audioPlayer.duration;
+                    setState(() {}); // Force a rebuild of the widget
+                    return Column(
+                      children: [
+                        Slider(
+                          value: position.inSeconds.toDouble(),
+                          max: _duration?.inSeconds?.toDouble() ?? 0.0,
+                          onChanged: (double value) {
+                            setState(() {
+                              _audioPlayer
+                                  .seek(Duration(seconds: value.toInt()));
+                            });
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$positionText/$durationText',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+            /* TESTO DESCRIPTION 
+            Row(
               children: [
                 Padding(
                   padding: EdgeInsets.all(
@@ -360,9 +418,3 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 ),
               ],
             ) */
-          ],
-        ),
-      ),
-    );
-  }
-}
