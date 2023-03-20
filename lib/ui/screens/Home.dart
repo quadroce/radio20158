@@ -1,10 +1,12 @@
 //import 'dart:js';
 import 'package:share/share.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +19,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   RssFeed? _rssFeed;
   List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -134,6 +138,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text('Radio 20158'),
@@ -146,6 +151,80 @@ class _HomeState extends State<Home> {
             ),
           ),
           preferredSize: Size.fromHeight(30.0),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Text('Menu'),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                // TODO: implement action for item 1
+              },
+            ),
+            ListTile(
+              title: Text('Item 2'),
+              onTap: () {
+                // TODO: implement action for item 2
+              },
+            ),
+            ListTile(
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.link),
+                    onPressed: () async {
+                      const url = 'http://www.radio20158.org';
+                      final uri = Uri.parse(url);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.facebook),
+                    onPressed: () {
+                      () async {
+                        const url = 'https://www.facebook.com/radio20158';
+                        if (await canLaunchUrl(url as Uri)) {
+                          await launchUrl(url as Uri);
+                        } else {
+                          throw 'Could not launch $url';
+                        }
+                        ;
+                      };
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(FontAwesomeIcons.instagram),
+                    onPressed: () {
+                      () async {
+                        const url = 'https://www.instagram.com/radio_20158/';
+                        if (await canLaunchUrl(url as Uri)) {
+                          await launchUrl(url as Uri);
+                        } else {
+                          throw 'Could not launch $url';
+                        }
+                        ;
+                      };
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
       body: _rssFeed == null
