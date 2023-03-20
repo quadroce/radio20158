@@ -1,3 +1,5 @@
+//import 'package:flutter_cast_framework/flutter_cast_framework.dart';
+
 import 'package:radio20158/ui/screens/Home.dart';
 import 'package:flutter/material.dart';
 
@@ -50,6 +52,15 @@ class _SplashPageState extends State<SplashPage> {
           Navigator.of(context)
               .pushReplacement(MaterialPageRoute(builder: (context) => Home()))
         });
+    /*   CastContext.instance.setConfiguration(
+      CastContextConfig(
+        androidAppId:
+            '[APP_ID]', // sostituisci [APP_ID] con il tuo ID dell'applicazione Chromecast
+        receiverAppId:
+            '[RECEIVER_APP_ID]', // sostituisci [RECEIVER_APP_ID] con il tuo ID dell'applicazione del ricevitore Chromecast
+      ),
+    );
+   */
   }
 
   @override

@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.radio_20158_2">
+<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
     <application
         android:label="Radio 20158"
         android:name="${applicationName}"

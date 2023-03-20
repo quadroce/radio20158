@@ -9,8 +9,8 @@ class AppTheme {
     primaryColor: kPrimaryColor,
     primaryColorLight: kPrimaryColorLight,
     hintColor: kAccentColor,
-    backgroundColor: kBackgroundColor,
-    errorColor: kErrorColor,
+    /*  backgroundColor: kBackgroundColor,
+    errorColor: kErrorColor, */
     textTheme: GoogleFonts.overlockTextTheme(),
   );
 }

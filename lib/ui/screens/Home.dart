@@ -161,20 +161,26 @@ class _HomeState extends State<Home> {
       ),
       drawer: Drawer(
         child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
               child: Text('Menu'),
+              padding: EdgeInsets.zero,
             ),
             ListTile(
-              title: Text('Item 1'),
+              trailing: Icon(Icons.close),
               onTap: () {
-                // TODO: implement action for item 1
+                Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Item 2'),
+              title: Text('Radio20158'),
+              subtitle: Text('STORIE, VOCI E SUONI FUORI DAL CORTILE'),
               onTap: () {
-                // TODO: implement action for item 2
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RadioWidget()),
+                );
               },
             ),
             ListTile(
@@ -182,43 +188,61 @@ class _HomeState extends State<Home> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.link),
-                    onPressed: () async {
-                      const url = 'http://www.radio20158.org';
-                      final uri = Uri.parse(url);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      } else {
-                        throw 'Could not launch $url';
+                    icon: Icon(Icons.facebook),
+                    onPressed: () {
+                      try {
+                        () async {
+                          final Uri url =
+                              Uri.parse('https://www.facebook.com/radio20158');
+
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        }();
+                      } catch (e) {
+                        print('An error occurred: $e');
                       }
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.facebook),
+                    icon: Icon(FontAwesomeIcons.instagram,
+                        color: Color.fromRGBO(255, 0, 0, 1.0)),
                     onPressed: () {
-                      () async {
-                        const url = 'https://www.facebook.com/radio20158';
-                        if (await canLaunchUrl(url as Uri)) {
-                          await launchUrl(url as Uri);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
-                        ;
-                      };
+                      try {
+                        () async {
+                          final Uri url = Uri.parse(
+                              'https://www.instagram.com/radio_20158');
+
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        }();
+                      } catch (e) {
+                        print('An error occurred: $e');
+                      }
                     },
                   ),
                   IconButton(
-                    icon: Icon(FontAwesomeIcons.instagram),
+                    icon: Icon(Icons.link_outlined),
                     onPressed: () {
-                      () async {
-                        const url = 'https://www.instagram.com/radio_20158/';
-                        if (await canLaunchUrl(url as Uri)) {
-                          await launchUrl(url as Uri);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
-                        ;
-                      };
+                      try {
+                        () async {
+                          final Uri url =
+                              Uri.parse('https://www.radio20158.org');
+
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        }();
+                      } catch (e) {
+                        print('An error occurred: $e');
+                      }
                     },
                   ),
                 ],
@@ -317,6 +341,39 @@ void openAudioPlayer(
               mediumArticle.image.toString())));
 }
 
+class RadioWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Radio20158'),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'RADIO20158',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24.0,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              'STORIE, VOCI E SUONI FUORI DAL CORTILE\n\nRadio 20158 è la web radio del quartiere Dergano Bovisa, che trasmette storie, voci e suoni di una comunità dinamica, multiculturale, in un’area in grande trasformazione.\n\nDai nostri microfoni prende voce il fermento delle attività e delle iniziative che si svolgono nel quartiere (ma non solo), promuovendo le iniziative e i diversi spazi attivi sul territorio per stimolare la partecipazione e migliorare la coesione sociale.\n\nLa musica rappresenta una parte importante di questo progetto: ci piace fare playlist cercando di spaziare il più possibile nei generi musicali.\n\nIdeatore e produttore: Andrea Baccalini',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class AudioPlayerScreen extends StatefulWidget {
   final String url;
   final String mediumArticletitle;
@@ -369,74 +426,80 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FadeInImage.assetNetwork(
-                  placeholder: 'assets/images/placeholder.png',
-                  image: widget.itunesImage.toString(),
-                  width: 300,
-                ),
-              ],
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FadeInImage.assetNetwork(
+                    placeholder: 'assets/images/placeholder.png',
+                    image: widget.itunesImage.toString(),
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 16), // add some spacing between the rows
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(widget.mediumArticletitle,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    )),
-              ],
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(widget.mediumArticletitle,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      )),
+                ],
+              ),
             ),
             SizedBox(height: 16), // add some spacing between the rows
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.forward_30),
-                  onPressed: () async {
-                    Duration newPosition =
-                        _audioPlayer.position + Duration(seconds: 30);
-                    await _audioPlayer.seek(newPosition);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.pause),
-                  onPressed: () async {
-                    await _audioPlayer.pause();
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.play_arrow,
-                    color:
-                        _isPlaying ? Color.fromARGB(255, 205, 254, 11) : null,
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.forward_30),
+                    onPressed: () async {
+                      Duration newPosition =
+                          _audioPlayer.position + Duration(seconds: 30);
+                      await _audioPlayer.seek(newPosition);
+                    },
                   ),
-                  onPressed: () async {
-                    setState(() {
-                      _isPlaying = true;
-                      // Change color to red (or any other color) when button is pressed
-                      // by passing the new color as a parameter to setState
-                      Color newColor = Color.fromARGB(255, 254, 11, 11);
-                      // Pass the new color as a parameter to setState
-                      // to trigger a rebuild of the widget tree with the new color
-                      var _iconColor = newColor;
-                    });
-                    await _audioPlayer.play();
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.replay_30),
-                  onPressed: () async {
-                    Duration newPosition =
-                        _audioPlayer.position + Duration(seconds: -30);
-                    await _audioPlayer.seek(newPosition);
-                  },
-                ),
-              ],
+                  IconButton(
+                    icon: Icon(Icons.pause),
+                    onPressed: () async {
+                      await _audioPlayer.pause();
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.play_arrow,
+                      color:
+                          _isPlaying ? Color.fromARGB(255, 205, 254, 11) : null,
+                    ),
+                    onPressed: () async {
+                      setState(() {
+                        _isPlaying = true;
+                        // Change color to red (or any other color) when button is pressed
+                        // by passing the new color as a parameter to setState
+                        Color newColor = Color.fromARGB(255, 254, 11, 11);
+                        // Pass the new color as a parameter to setState
+                        // to trigger a rebuild of the widget tree with the new color
+                        var _iconColor = newColor;
+                      });
+                      await _audioPlayer.play();
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.replay_30),
+                    onPressed: () async {
+                      Duration newPosition =
+                          _audioPlayer.position + Duration(seconds: -30);
+                      await _audioPlayer.seek(newPosition);
+                    },
+                  ),
+                ],
+              ),
             ),
 
             StreamBuilder<Duration>(
