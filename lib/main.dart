@@ -10,6 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Radio 20158',
+
       theme: ThemeData(
         brightness: Brightness.dark, // set brightness to dark
         scaffoldBackgroundColor: Color.fromRGBO(38, 34, 47, 0.8),

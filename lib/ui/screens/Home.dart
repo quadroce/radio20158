@@ -1,8 +1,10 @@
 //import 'dart:js';
+import 'package:share/share.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:flutter_share/flutter_share.dart';
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +18,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   RssFeed? _rssFeed;
-  List<MediumArticle> _mediumArticles = [];
+  List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
   int _currentPage = 1;
   bool _isLoadingMore = false;
@@ -70,7 +72,7 @@ class _HomeState extends State<Home> {
 
         for (RssItem rssItem in items) {
           if (rssItem.description != null) {
-            MediumArticle mediumArticle = MediumArticle(
+            trasmissione mediumArticle = trasmissione(
               title: rssItem.title!,
               link: rssItem.link!,
               datePublished: rssItem.pubDate.toString(),
@@ -103,7 +105,7 @@ class _HomeState extends State<Home> {
 
         for (RssItem rssItem in items) {
           if (rssItem.description != null) {
-            MediumArticle mediumArticle = MediumArticle(
+            trasmissione mediumArticle = trasmissione(
               title: rssItem.title!,
               link: rssItem.link!,
               datePublished: rssItem.pubDate.toString(),
@@ -135,6 +137,16 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         centerTitle: true,
         title: Text('Radio 20158'),
+        bottom: PreferredSize(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Voci e suoni fuori dal cortile',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
+          preferredSize: Size.fromHeight(30.0),
+        ),
       ),
       body: _rssFeed == null
           ? Center(child: CircularProgressIndicator())
@@ -144,7 +156,7 @@ class _HomeState extends State<Home> {
                   child: ListView.builder(
                     itemCount: _mediumArticles.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return MediumArticleItem(
+                      return TrasmissioneItem(
                         article: _mediumArticles[index],
                         audioPlayer: _audioPlayer,
                       );
@@ -157,7 +169,7 @@ class _HomeState extends State<Home> {
   }
 }
 
-class MediumArticle {
+class trasmissione {
   String title;
   String link;
   String datePublished;
@@ -166,7 +178,7 @@ class MediumArticle {
   final String? image;
   Duration position = Duration.zero;
 
-  MediumArticle({
+  trasmissione({
     required this.title,
     required this.link,
     required this.datePublished,
@@ -176,11 +188,11 @@ class MediumArticle {
   });
 }
 
-class MediumArticleItem extends StatelessWidget {
-  final MediumArticle article;
+class TrasmissioneItem extends StatelessWidget {
+  final trasmissione article;
   final AudioPlayer audioPlayer;
 
-  MediumArticleItem({required this.article, required this.audioPlayer});
+  TrasmissioneItem({required this.article, required this.audioPlayer});
 
   @override
   Widget build(BuildContext context) {
@@ -213,23 +225,28 @@ class MediumArticleItem extends StatelessWidget {
 }
 
 void openAudioPlayer(
-    String url, MediumArticle mediumArticle, BuildContext context) {
+    String url, trasmissione mediumArticle, BuildContext context) {
   String url2 = "https://www.radio20158.org" + url;
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => AudioPlayerScreen(url2, mediumArticle.title,
-              mediumArticle.summary, mediumArticle.image.toString())));
+          builder: (context) => AudioPlayerScreen(
+              url2,
+              mediumArticle.title,
+              mediumArticle.summary,
+              mediumArticle.link,
+              mediumArticle.image.toString())));
 }
 
 class AudioPlayerScreen extends StatefulWidget {
   final String url;
   final String mediumArticletitle;
   final String mediumArticleDescription;
+  final String mediumArticleLink;
   final String itunesImage;
 
   AudioPlayerScreen(this.url, this.mediumArticletitle,
-      this.mediumArticleDescription, this.itunesImage);
+      this.mediumArticleDescription, this.mediumArticleLink, this.itunesImage);
 
   @override
   _AudioPlayerScreenState createState() => _AudioPlayerScreenState();
@@ -376,6 +393,27 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                               ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                            height: 16), // add some spacing between the rows
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.share),
+                              onPressed: () {
+                                final String testoDaCondividere =
+                                    "Ascolta la trasmissione: " +
+                                        widget.mediumArticletitle +
+                                        " su " +
+                                        widget.mediumArticleLink +
+                                        "\n" +
+                                        "Segui \#radio20158 sui social";
+                                Share.share(testoDaCondividere);
+                              },
                             ),
                           ],
                         ),

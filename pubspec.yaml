@@ -17,6 +17,8 @@ dependencies:
   webfeed: ^0.7.0 # https://pub.dev/packages/webfeed
   url_launcher: ^6.1.10 #https://pub.dev/packages/url_launcher
   just_audio: ^0.9.31
+  flutter_share: ^2.0.0
+  share: ^2.0.4
  
 
 
