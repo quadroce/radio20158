@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
 import 'package:just_audio/just_audio.dart';
+import 'topbar.dart';
 
 class Home extends StatefulWidget {
   final RssFeed feed; // add a Feed parameter to the Home widget
@@ -24,41 +25,28 @@ class _HomeState extends State<Home> {
   List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  bool _isLoadingMore = false;
   late final trasmissione article;
   late final AudioPlayer audioPlayer;
 
   Future<void> loadMoreData() async {
-    if (!_isLoadingMore) {
-      setState(() {
-        _isLoadingMore = true;
-      });
+    //  final feed = await getMediumRSSFeedData(_currentPage);
 
-      //  final feed = await getMediumRSSFeedData(_currentPage);
+    List<RssItem> items = widget.feed.items ?? [];
 
-      if (widget.feed != null) {
-        List<RssItem> items = widget.feed.items ?? [];
+    for (RssItem rssItem in items) {
+      if (rssItem.description != null) {
+        trasmissione mediumArticle = trasmissione(
+          title: rssItem.title!,
+          link: rssItem.link!,
+          datePublished: rssItem.pubDate.toString(),
+          enclosure: rssItem.enclosure!.url!,
+          summary: rssItem.itunes!.summary.toString(),
+          image: rssItem.itunes?.image.toString(),
+          nomedelloshow: rssItem.categories.toString(),
+        );
 
-        for (RssItem rssItem in items) {
-          if (rssItem.description != null) {
-            trasmissione mediumArticle = trasmissione(
-              title: rssItem.title!,
-              link: rssItem.link!,
-              datePublished: rssItem.pubDate.toString(),
-              enclosure: rssItem.enclosure!.url!,
-              summary: rssItem.itunes!.summary.toString(),
-              image: rssItem.itunes?.image.toString(),
-              nomedelloshow: rssItem.categories.toString(),
-            );
-
-            _mediumArticles.add(mediumArticle);
-          }
-        }
+        _mediumArticles.add(mediumArticle);
       }
-
-      setState(() {
-        _isLoadingMore = false;
-      });
     }
   }
 
@@ -84,7 +72,7 @@ class _HomeState extends State<Home> {
           image: rssItem.itunes?.image?.href != null
               ? Uri.parse(rssItem.itunes!.image!.href!).toString()
               : null,
-          nomedelloshow: rssItem.categories.toString(),
+          nomedelloshow: removeEpisode(rssItem.title!),
         );
 
         _mediumArticles.add(mediumArticle);
@@ -96,26 +84,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Radio 20158'),
-        bottom: PreferredSize(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Voci e suoni fuori dal cortile',
-              style: TextStyle(fontSize: 16.0),
-            ),
-          ),
-          preferredSize: Size.fromHeight(30.0),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-          },
-        ),
-      ),
+      appBar: AppBar(),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -234,7 +203,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-/*  */
 class trasmissione {
   String title;
   String link;
@@ -310,39 +278,6 @@ void openAudioPlayer(
               mediumArticle.nomedelloshow)));
 }
 
-class RadioWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Radio20158'),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'RADIO20158',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24.0,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              'STORIE, VOCI E SUONI FUORI DAL CORTILE\n\nRadio 20158 è la web radio del quartiere Dergano Bovisa, che trasmette storie, voci e suoni di una comunità dinamica, multiculturale, in un’area in grande trasformazione.\n\nDai nostri microfoni prende voce il fermento delle attività e delle iniziative che si svolgono nel quartiere (ma non solo), promuovendo le iniziative e i diversi spazi attivi sul territorio per stimolare la partecipazione e migliorare la coesione sociale.\n\nLa musica rappresenta una parte importante di questo progetto: ci piace fare playlist cercando di spaziare il più possibile nei generi musicali.\n\nIdeatore e produttore: Andrea Baccalini',
-              style: TextStyle(
-                fontSize: 16.0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class AudioPlayerScreen extends StatefulWidget {
   final String url;
   final String mediumArticletitle;
@@ -396,7 +331,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.mediumArticletitle),
+        title: Text(widget.mediumArticleNome),
       ),
       body: Center(
         child: Column(
@@ -450,18 +385,10 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   IconButton(
                     icon: Icon(
                       Icons.play_arrow,
-                      color:
-                          _isPlaying ? Color.fromARGB(255, 205, 254, 11) : null,
                     ),
                     onPressed: () async {
                       setState(() {
                         _isPlaying = true;
-                        // Change color to red (or any other color) when button is pressed
-                        // by passing the new color as a parameter to setState
-                        Color newColor = Color.fromARGB(255, 254, 11, 11);
-                        // Pass the new color as a parameter to setState
-                        // to trigger a rebuild of the widget tree with the new color
-                        var _iconColor = newColor;
                       });
                       await _audioPlayer.play();
                     },
@@ -495,7 +422,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                       children: [
                         Slider(
                           value: position.inSeconds.toDouble(),
-                          max: _duration?.inSeconds?.toDouble() ?? 0.0,
+                          max: _duration?.inSeconds.toDouble() ?? 0.0,
                           onChanged: (double value) {
                             setState(() {
                               _audioPlayer
