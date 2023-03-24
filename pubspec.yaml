@@ -20,7 +20,7 @@ dependencies:
   flutter_share: ^2.0.0
   share: ^2.0.4
   font_awesome_flutter: ^10.4.0
-  
+  xml: ^5.0.2
 
 
 

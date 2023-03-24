@@ -1,19 +1,19 @@
-//import 'dart:js';
 import 'package:share/share.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter_share/flutter_share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
-import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-//import 'package:audioplayers/audioplayers.dart';
 
 class Home extends StatefulWidget {
+  final RssFeed feed; // add a Feed parameter to the Home widget
+
+  const Home({Key? key, required this.feed})
+      : super(key: key); // add the Feed parameter to the constructor
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -21,45 +21,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  RssFeed? _rssFeed;
   List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
-  int _currentPage = 1;
-  bool _isLoadingMore = false;
 
-  Future<RssFeed?> getMediumRSSFeedData(int page) async {
-    try {
-      final client = http.Client();
-      final response = await client
-          .get(Uri.parse('https://radio20158.org/feed/podcast/?paged=$page'));
-      return RssFeed.parse(response.body);
-    } catch (e) {
-      print(e);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Error'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('An error occurred while fetching data.'),
-                Text('Please try again later.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    }
-    return null;
-  }
+  bool _isLoadingMore = false;
+  late final trasmissione article;
+  late final AudioPlayer audioPlayer;
 
   Future<void> loadMoreData() async {
     if (!_isLoadingMore) {
@@ -67,12 +34,10 @@ class _HomeState extends State<Home> {
         _isLoadingMore = true;
       });
 
-      _currentPage++;
+      //  final feed = await getMediumRSSFeedData(_currentPage);
 
-      final feed = await getMediumRSSFeedData(_currentPage);
-
-      if (feed != null) {
-        List<RssItem> items = feed.items ?? [];
+      if (widget.feed != null) {
+        List<RssItem> items = widget.feed.items ?? [];
 
         for (RssItem rssItem in items) {
           if (rssItem.description != null) {
@@ -83,6 +48,7 @@ class _HomeState extends State<Home> {
               enclosure: rssItem.enclosure!.url!,
               summary: rssItem.itunes!.summary.toString(),
               image: rssItem.itunes?.image.toString(),
+              nomedelloshow: rssItem.categories.toString(),
             );
 
             _mediumArticles.add(mediumArticle);
@@ -101,38 +67,29 @@ class _HomeState extends State<Home> {
     super.initState();
     initializeDateFormatting('it_IT', null);
 
-    getMediumRSSFeedData(1).then((feed) {
-      updateFeed(feed);
+    List<RssItem> items = widget.feed.items ?? [];
+    String removeEpisode(String title) {
+      RegExp regex = RegExp(r'S\d+E\d+');
+      return title.replaceAll(regex, '').trim();
+    }
 
-      if (feed != null) {
-        List<RssItem> items = feed.items ?? [];
+    for (RssItem rssItem in items) {
+      if (rssItem.description != null) {
+        trasmissione mediumArticle = trasmissione(
+          title: rssItem.title!,
+          link: rssItem.link!,
+          datePublished: rssItem.pubDate.toString(),
+          enclosure: rssItem.enclosure!.url!,
+          summary: rssItem.itunes!.summary!,
+          image: rssItem.itunes?.image?.href != null
+              ? Uri.parse(rssItem.itunes!.image!.href!).toString()
+              : null,
+          nomedelloshow: rssItem.categories.toString(),
+        );
 
-        for (RssItem rssItem in items) {
-          if (rssItem.description != null) {
-            trasmissione mediumArticle = trasmissione(
-              title: rssItem.title!,
-              link: rssItem.link!,
-              datePublished: rssItem.pubDate.toString(),
-              enclosure: rssItem.enclosure!.url!,
-              summary: rssItem.itunes!.summary!,
-              image: rssItem.itunes?.image?.href != null
-                  ? Uri.parse(rssItem.itunes!.image!.href!).toString()
-                  : null,
-
-              // image: rssItem.itunes?.image.toString(),
-            );
-
-            _mediumArticles.add(mediumArticle);
-          }
-        }
+        _mediumArticles.add(mediumArticle);
       }
-    });
-  }
-
-  updateFeed(feed) {
-    setState(() {
-      _rssFeed = feed;
-    });
+    }
   }
 
   @override
@@ -163,14 +120,33 @@ class _HomeState extends State<Home> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
-              child: Text('Menu'),
-              padding: EdgeInsets.zero,
-            ),
             ListTile(
               trailing: Icon(Icons.close),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('tutti gli episodi'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _mediumArticles.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final article = _mediumArticles[index];
+                        final audioPlayer = _audioPlayer;
+
+                        return TrasmissioneItem(
+                          article: article,
+                          audioPlayer: audioPlayer,
+                        );
+                      },
+                    ),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -208,7 +184,7 @@ class _HomeState extends State<Home> {
                   ),
                   IconButton(
                     icon: Icon(FontAwesomeIcons.instagram,
-                        color: Color.fromRGBO(255, 0, 0, 1.0)),
+                        color: Color.fromRGBO(235, 143, 6, 1)),
                     onPressed: () {
                       try {
                         () async {
@@ -251,27 +227,14 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: _rssFeed == null
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _mediumArticles.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return TrasmissioneItem(
-                        article: _mediumArticles[index],
-                        audioPlayer: _audioPlayer,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+      body: Center(
+        child: Text('Hello, World!'),
+      ),
     );
   }
 }
 
+/*  */
 class trasmissione {
   String title;
   String link;
@@ -279,6 +242,7 @@ class trasmissione {
   String enclosure;
   String summary;
   final String? image;
+  String nomedelloshow;
   Duration position = Duration.zero;
 
   trasmissione({
@@ -288,6 +252,7 @@ class trasmissione {
     required this.enclosure,
     required this.summary,
     required this.image,
+    required this.nomedelloshow,
   });
 }
 
@@ -300,28 +265,31 @@ class TrasmissioneItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        children: [
-          ListTile(
-            leading: SizedBox(
-              width: 50, // set the width of the image
-              child: FadeInImage.assetNetwork(
-                placeholder: 'assets/images/placeholder.png',
-                image: article.image!,
-                fit: BoxFit.cover, // set the image fit to cover the box
-              ),
-            ),
-            title: Text(article.title),
-            subtitle: Text(DateFormat('dd MMMM y', 'it_IT')
-                .format(DateTime.parse(article.datePublished))),
-            trailing: ElevatedButton(
-              onPressed: () async {
-                openAudioPlayer(article.enclosure.toString(), article, context);
-              },
-              child: Text("ascolta"),
-            ),
+      child: ListTile(
+        leading: SizedBox(
+          width: 50, // set the width of the image
+          child: FadeInImage.assetNetwork(
+            placeholder: 'assets/images/placeholder.png',
+            image: article.image!,
+            fit: BoxFit.cover, // set the image fit to cover the box
           ),
-        ],
+        ),
+        title: Text(article.title),
+        subtitle: Text(
+          DateFormat('dd MMMM y', 'it_IT').format(
+            DateTime.parse(article.datePublished),
+          ),
+        ),
+        trailing: ElevatedButton(
+          onPressed: () async {
+            openAudioPlayer(
+              article.enclosure.toString(),
+              article,
+              context,
+            );
+          },
+          child: Text("ascolta"),
+        ),
       ),
     );
   }
@@ -338,7 +306,8 @@ void openAudioPlayer(
               mediumArticle.title,
               mediumArticle.summary,
               mediumArticle.link,
-              mediumArticle.image.toString())));
+              mediumArticle.image.toString(),
+              mediumArticle.nomedelloshow)));
 }
 
 class RadioWidget extends StatelessWidget {
@@ -380,9 +349,16 @@ class AudioPlayerScreen extends StatefulWidget {
   final String mediumArticleDescription;
   final String mediumArticleLink;
   final String itunesImage;
+  final String mediumArticleNome;
 
-  AudioPlayerScreen(this.url, this.mediumArticletitle,
-      this.mediumArticleDescription, this.mediumArticleLink, this.itunesImage);
+  AudioPlayerScreen(
+    this.url,
+    this.mediumArticletitle,
+    this.mediumArticleDescription,
+    this.mediumArticleLink,
+    this.itunesImage,
+    this.mediumArticleNome,
+  );
 
   @override
   _AudioPlayerScreenState createState() => _AudioPlayerScreenState();
@@ -571,26 +547,3 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 }
-
-
-
-
-            /* TESTO DESCRIPTION 
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(
-                      28.0), // add 8 pixels of padding on all sides
-                  child: Text(
-                    widget.mediumArticleDescription,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                    overflow:
-                        TextOverflow.ellipsis, // add ellipsis if text overflows
-                    // limit text to one line
-                  ),
-                ),
-              ],
-            ) */
