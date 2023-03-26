@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 class RadioAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuPressed;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const RadioAppBar({Key? key, this.onMenuPressed}) : super(key: key);
-
+  const RadioAppBar({Key? key, this.onMenuPressed, required this.scaffoldKey})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -17,14 +18,16 @@ class RadioAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             'Voci e suoni fuori dal cortile',
-            style: TextStyle(fontSize: 16.0),
+            style: TextStyle(fontSize: 8.0),
           ),
         ),
         preferredSize: Size.fromHeight(30.0),
       ),
       leading: IconButton(
         icon: Icon(Icons.menu),
-        onPressed: onMenuPressed,
+        onPressed: () {
+          scaffoldKey.currentState?.openDrawer();
+        },
       ),
     );
   }

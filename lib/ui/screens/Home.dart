@@ -1,13 +1,13 @@
 import 'package:share/share.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:webfeed/webfeed.dart';
 import 'package:just_audio/just_audio.dart';
 import 'topbar.dart';
+import 'trasmissioneitem.dart';
 
 class Home extends StatefulWidget {
   final RssFeed feed; // add a Feed parameter to the Home widget
@@ -21,6 +21,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _drawerKey =
+      GlobalKey<ScaffoldState>(); // add this line
 
   List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -29,8 +31,6 @@ class _HomeState extends State<Home> {
   late final AudioPlayer audioPlayer;
 
   Future<void> loadMoreData() async {
-    //  final feed = await getMediumRSSFeedData(_currentPage);
-
     List<RssItem> items = widget.feed.items ?? [];
 
     for (RssItem rssItem in items) {
@@ -84,8 +84,15 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(),
+      appBar: RadioAppBar(
+        scaffoldKey: _scaffoldKey,
+        onMenuPressed: () {
+          // Open the drawer
+          _drawerKey.currentState?.openDrawer(); // modify this line
+        },
+      ),
       drawer: Drawer(
+        key: _drawerKey, //
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -96,7 +103,7 @@ class _HomeState extends State<Home> {
               },
             ),
             ListTile(
-              title: Text('tutti gli episodi'),
+              title: Text('Tutti gli episodi'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -196,8 +203,82 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: Center(
-        child: Text('Hello, World!'),
+      //LA hOME
+
+      body: Column(
+        children: [
+          Container(
+            height: 300,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/placeholder.png',
+                  image: _mediumArticles.isNotEmpty
+                      ? _mediumArticles.first.image!
+                      : '',
+                  height: 100,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  _mediumArticles.isNotEmpty ? _mediumArticles.first.title : '',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_mediumArticles.isNotEmpty) {
+                      final article = _mediumArticles.first;
+                      openAudioPlayer(
+                          article.enclosure.toString(), article, context);
+                    }
+                  },
+                  child: Text('Ascolta'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount:
+                  _mediumArticles.length > 10 ? 10 : _mediumArticles.length,
+              itemBuilder: (BuildContext context, int index) {
+                final article = _mediumArticles[index + 1];
+                final audioPlayer = _audioPlayer;
+
+                return TrasmissioneItem(
+                  article: article,
+                  audioPlayer: audioPlayer,
+                );
+              },
+            ),
+          ),
+          if (_mediumArticles.length > 10)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _mediumArticles.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final article = _mediumArticles[index];
+                        final audioPlayer = _audioPlayer;
+
+                        return TrasmissioneItem(
+                          article: article,
+                          audioPlayer: audioPlayer,
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: Text('Tutti gli Episodi'),
+            ),
+        ],
       ),
     );
   }
@@ -222,45 +303,6 @@ class trasmissione {
     required this.image,
     required this.nomedelloshow,
   });
-}
-
-class TrasmissioneItem extends StatelessWidget {
-  final trasmissione article;
-  final AudioPlayer audioPlayer;
-
-  TrasmissioneItem({required this.article, required this.audioPlayer});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: SizedBox(
-          width: 50, // set the width of the image
-          child: FadeInImage.assetNetwork(
-            placeholder: 'assets/images/placeholder.png',
-            image: article.image!,
-            fit: BoxFit.cover, // set the image fit to cover the box
-          ),
-        ),
-        title: Text(article.title),
-        subtitle: Text(
-          DateFormat('dd MMMM y', 'it_IT').format(
-            DateTime.parse(article.datePublished),
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () async {
-            openAudioPlayer(
-              article.enclosure.toString(),
-              article,
-              context,
-            );
-          },
-          child: Text("ascolta"),
-        ),
-      ),
-    );
-  }
 }
 
 void openAudioPlayer(
@@ -326,7 +368,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool _isPlaying = false;
     Duration? _duration = _audioPlayer.duration ?? Duration.zero;
 
     return Scaffold(
@@ -387,9 +428,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                       Icons.play_arrow,
                     ),
                     onPressed: () async {
-                      setState(() {
-                        _isPlaying = true;
-                      });
                       await _audioPlayer.play();
                     },
                   ),
