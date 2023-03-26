@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:share/share.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -209,32 +211,41 @@ class _HomeState extends State<Home> {
         children: [
           Container(
             height: 300,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(_mediumArticles.isNotEmpty
+                    ? _mediumArticles.first.image!
+                    : ''),
+                fit: BoxFit.fitWidth,
+                opacity: 150,
+              ),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FadeInImage.assetNetwork(
-                  placeholder: 'assets/images/placeholder.png',
-                  image: _mediumArticles.isNotEmpty
-                      ? _mediumArticles.first.image!
-                      : '',
-                  height: 100,
-                ),
                 SizedBox(height: 20),
                 Text(
                   _mediumArticles.isNotEmpty ? _mediumArticles.first.title : '',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_mediumArticles.isNotEmpty) {
-                      final article = _mediumArticles.first;
-                      openAudioPlayer(
-                          article.enclosure.toString(), article, context);
-                    }
-                  },
-                  child: Text('Ascolta'),
-                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_mediumArticles.isNotEmpty) {
+                        final article = _mediumArticles.first;
+                        openAudioPlayer(
+                            article.enclosure.toString(), article, context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 60),
+                        padding: EdgeInsets.all(10)),
+                    child: Text('Ascolta', style: TextStyle(fontSize: 20)),
+                  ),
+                )
               ],
             ),
           ),
