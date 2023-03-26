@@ -142,7 +142,8 @@ class _HomeState extends State<Home> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.facebook),
+                    icon: Icon(Icons.facebook,
+                        color: Color.fromRGBO(106, 106, 207, 0.984)),
                     onPressed: () {
                       try {
                         () async {
