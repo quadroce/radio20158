@@ -10,6 +10,7 @@ import 'package:webfeed/webfeed.dart';
 import 'package:just_audio/just_audio.dart';
 import 'topbar.dart';
 import 'trasmissioneitem.dart';
+import 'openAudioPlayer.dart';
 
 class Home extends StatefulWidget {
   final RssFeed feed; // add a Feed parameter to the Home widget
@@ -220,6 +221,7 @@ class _HomeState extends State<Home> {
                     : ''),
                 fit: BoxFit.fitWidth,
                 opacity: 150,
+                alignment: Alignment.topCenter,
               ),
             ),
             child: Column(
@@ -242,61 +244,70 @@ class _HomeState extends State<Home> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 60),
+                        minimumSize: Size(200, 60),
                         padding: EdgeInsets.all(10)),
-                    child: Text('Ascolta', style: TextStyle(fontSize: 20)),
+                    child: Text('Ascolta la puntata',
+                        style: TextStyle(fontSize: 20)),
                   ),
                 )
               ],
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount:
-                  _mediumArticles.length > 10 ? 10 : _mediumArticles.length,
-              itemBuilder: (BuildContext context, int index) {
-                final article = _mediumArticles[index + 1];
-                final audioPlayer = _audioPlayer;
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _mediumArticles.length > 10
+                        ? 10
+                        : _mediumArticles.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final article = _mediumArticles[index + 1];
+                      final audioPlayer = _audioPlayer;
 
-                return TrasmissioneItem(
-                  article: article,
-                  audioPlayer: audioPlayer,
-                );
-              },
+                      return TrasmissioneItem(
+                        article: article,
+                        audioPlayer: audioPlayer,
+                      );
+                    },
+                  ),
+                ),
+                if (_mediumArticles.length > 10)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _mediumArticles.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final article = _mediumArticles[index];
+                              final audioPlayer = _audioPlayer;
+
+                              return TrasmissioneItem(
+                                article: article,
+                                audioPlayer: audioPlayer,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text('Tutti gli Episodi'),
+                  ),
+              ],
             ),
           ),
-          if (_mediumArticles.length > 10)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _mediumArticles.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final article = _mediumArticles[index];
-                        final audioPlayer = _audioPlayer;
-
-                        return TrasmissioneItem(
-                          article: article,
-                          audioPlayer: audioPlayer,
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
-              child: Text('Tutti gli Episodi'),
-            ),
         ],
       ),
     );
   }
 }
 
-class trasmissione {
+/* class trasmissione {
   String title;
   String link;
   String datePublished;
@@ -523,4 +534,4 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-}
+} */
