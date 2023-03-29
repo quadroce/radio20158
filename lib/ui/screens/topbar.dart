@@ -36,13 +36,37 @@ class RadioAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class RadioWidget extends StatelessWidget {
+class BottomBarAppBar extends StatelessWidget {
+  const BottomBarAppBar({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search),
+          label: 'Search',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.account_box_rounded),
+          label: 'Login',
+        ),
+      ],
+    );
+  }
+}
+
+class RadioWidget extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final GlobalKey<ScaffoldState> _bottomKey = GlobalKey<ScaffoldState>();
+
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Radio20158'),
-      ),
+      appBar: RadioAppBar(scaffoldKey: _scaffoldKey),
       body: Container(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -65,6 +89,7 @@ class RadioWidget extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomBarAppBar(key: _bottomKey),
     );
   }
 }

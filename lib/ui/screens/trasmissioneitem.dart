@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
-import 'topbar.dart';
 import 'openAudioPlayer.dart';
 
 class TrasmissioneItem extends StatelessWidget {
