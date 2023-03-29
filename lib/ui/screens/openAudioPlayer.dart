@@ -1,15 +1,7 @@
-import 'dart:ui';
-
 import 'package:share/share.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
-import 'package:webfeed/webfeed.dart';
 import 'package:just_audio/just_audio.dart';
-import 'home.dart';
-import 'trasmissioneitem.dart';
 
 class trasmissione {
   String title;
