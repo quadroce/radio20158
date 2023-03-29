@@ -228,6 +228,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomAppBar(),
     );
   }
 }

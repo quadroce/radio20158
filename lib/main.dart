@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:radio20158/ui/screens/Home.dart';
 import 'package:webfeed/webfeed.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 void main() {
   runApp(MyApp());
@@ -60,28 +61,20 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<RssFeed?> loadData() async {
     try {
-      final client = http.Client();
-      final response = await client
-          .get(Uri.parse('https://radio20158.org/feed/podcast/?paged=1'));
-      final feed = RssFeed.parse(response.body);
-      return feed;
+      final feedUrl = 'https://radio20158.org/feed/podcast/?paged=1';
+      final cachedResponse = await DefaultCacheManager().getSingleFile(feedUrl);
+      if (await cachedResponse.exists()) {
+        final cachedFeed = RssFeed.parse(await cachedResponse.readAsString());
+        return cachedFeed;
+      } else {
+        final client = http.Client();
+        final response = await client.get(Uri.parse(feedUrl));
+        final feed = RssFeed.parse(response.body);
+        await DefaultCacheManager().putFile(feedUrl, response.bodyBytes);
+        return feed;
+      }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Error'),
-          content: const Text(
-              'An error occurred while fetching data. Please trycatching the error message.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
+      // gestione dell'errore
       return null;
     }
   }
@@ -103,7 +96,7 @@ class _SplashPageState extends State<SplashPage> {
               fit: BoxFit.cover,
             ),
             const SizedBox(height: 20),
-            const CircularProgressIndicator(
+            const LinearProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
             const SizedBox(height: 20),
