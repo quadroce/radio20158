@@ -584,10 +584,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: b3dfd4c8a6974975a7f348b663050f3c5812a9a544d993554ee9664bde0e0bf8
+      sha256: f6deed8ed625c52864792459709183da231ebf66ff0cf09e69b573227c377efe
       url: "https://pub.dev"
     source: hosted
-    version: "11.2.1"
+    version: "11.3.0"
   webdriver:
     dependency: transitive
     description:

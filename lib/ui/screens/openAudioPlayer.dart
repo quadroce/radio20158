@@ -23,6 +23,8 @@ class trasmissione {
     required this.image,
     required this.nomedelloshow,
   });
+
+  get showName => null;
 }
 
 void openAudioPlayer(

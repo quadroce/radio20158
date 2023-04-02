@@ -1,6 +1,11 @@
 /*APPbar e Pagina */
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'trasmissioneitem.dart';
+import 'Home.dart';
+import 'openAudioPlayer.dart';
 
 class RadioAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuPressed;
@@ -59,14 +64,51 @@ class BottomBarAppBar extends StatelessWidget {
   }
 }
 
+class CustomDrawer extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const CustomDrawer({
+    Key? key,
+    required this.scaffoldKey,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            child: Text('Drawer Header'),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+          ),
+          ListTile(
+            title: Text('Item 1'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text('Item 2'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class RadioWidget extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  final GlobalKey<ScaffoldState> _bottomKey = GlobalKey<ScaffoldState>();
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: RadioAppBar(scaffoldKey: _scaffoldKey),
+      drawer: CustomDrawer(scaffoldKey: _scaffoldKey),
       body: Container(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -89,7 +131,7 @@ class RadioWidget extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomBarAppBar(key: _bottomKey),
+      bottomNavigationBar: BottomBarAppBar(key: _scaffoldKey),
     );
   }
 }

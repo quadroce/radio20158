@@ -8,6 +8,7 @@ import 'package:just_audio/just_audio.dart';
 import 'topbar.dart';
 import 'trasmissioneitem.dart';
 import 'openAudioPlayer.dart';
+import 'shows.dart';
 
 class Home extends StatefulWidget {
   final RssFeed feed; // add a Feed parameter to the Home widget
@@ -26,7 +27,7 @@ class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _drawerKey =
       GlobalKey<ScaffoldState>(); // add this line
 
-  List<trasmissione> _mediumArticles = [];
+  final List<trasmissione> _mediumArticles = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   late final trasmissione article;
@@ -124,6 +125,18 @@ class _HomeState extends State<Home> {
                       },
                     ),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Tutti gli Show'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AllShows(
+                            feed: widget.feed,
+                          )),
                 );
               },
             ),

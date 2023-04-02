@@ -63,10 +63,25 @@ class _SplashPageState extends State<SplashPage> {
     try {
       final feedUrl = 'https://radio20158.org/feed/podcast/?paged=1';
       final cachedResponse = await DefaultCacheManager().getSingleFile(feedUrl);
+
       if (await cachedResponse.exists()) {
         final cachedFeed = RssFeed.parse(await cachedResponse.readAsString());
-        return cachedFeed;
+        final lastModified =
+            await cachedResponse.lastModified(); // updated this line
+
+        if (DateTime.now().difference(lastModified).inMinutes < 60) {
+          // Cached version is less than 60 minutes old, so return it
+          return cachedFeed;
+        } else {
+          // Cached version is outdated, so refresh it
+          final client = http.Client();
+          final response = await client.get(Uri.parse(feedUrl));
+          final feed = RssFeed.parse(response.body);
+          await DefaultCacheManager().putFile(feedUrl, response.bodyBytes);
+          return feed;
+        }
       } else {
+        // No cached version found, so fetch and cache the feed
         final client = http.Client();
         final response = await client.get(Uri.parse(feedUrl));
         final feed = RssFeed.parse(response.body);
@@ -74,7 +89,7 @@ class _SplashPageState extends State<SplashPage> {
         return feed;
       }
     } catch (e) {
-      // gestione dell'errore
+      print('Error loading RSS feed: $e');
       return null;
     }
   }
