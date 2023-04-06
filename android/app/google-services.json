@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "329807048327",
+    "project_id": "radio20158-f636a",
+    "storage_bucket": "radio20158-f636a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329807048327:android:fee2b53b7b0898fd5e5222",
+        "android_client_info": {
+          "package_name": "com.example.radio_20158_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329807048327-j788m1jn3ctr922jch24gve5hl2481qr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTXfGU5Y4MXDX28gWPLA8t5XhTZ5zw6AU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329807048327-j788m1jn3ctr922jch24gve5hl2481qr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "329807048327-4v6gvn8u1m3re5sljh9ec9l5i7c562f5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.radio201582.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

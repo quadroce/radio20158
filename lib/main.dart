@@ -1,15 +1,24 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:radio20158/ui/screens/Home.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  get analytics => null;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +27,9 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           scaffoldBackgroundColor: const Color.fromRGBO(38, 34, 47, 0.8)),
       home: SplashPage(),
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
     );
   }
 }

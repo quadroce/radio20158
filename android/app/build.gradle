@@ -43,24 +43,16 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.radio_20158_2"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
-
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
-        }
-                release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -74,11 +66,23 @@ android {
     }
 }
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 flutter {
     source '../..'
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
+    implementation platform('com.google.firebase:firebase-bom:31.4.0')
+    implementation 'com.google.firebase:firebase-core'
+    // Add the dependency for the Analytics library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 }
+
+// Add the following at the bottom of the file
+apply plugin: 'com.google.gms.google-services'
